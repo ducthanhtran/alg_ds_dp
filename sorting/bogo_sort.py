@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from itertools import permutations
+from itertools import permutations, product
 from random import shuffle
 from typing import List, Sequence
 import argparse
@@ -29,53 +29,37 @@ def bogo_sort_randomized(integers: List[int]) -> List[int]:
 
 
 class TestCheckOrder(unittest.TestCase):
-    def test_empty(self):
-        empty = []
-        self.assertEqual(_is_sorted(empty), True)
-    
+
     def test_is_sorted(self):
-        a = [5]
-        self.assertEqual(_is_sorted(a), True)
-
-        b = [0, 1]
-        self.assertEqual(_is_sorted(b), True)
-
-        c = [1, 50]
-        self.assertEqual(_is_sorted(c), True)
-
-        d = [-5, -2]
-        self.assertEqual(_is_sorted(d), True)
-    
-    def test_is_not_sorted(self):
-        e = [1, 0]
-        self.assertEqual(_is_sorted(e), False)
-
-        f = [-5, -20]
-        self.assertEqual(_is_sorted(f), False)
+        params = [
+            ([], True),
+            ([5], True),
+            ([0, 1], True),
+            ([1, 50], True),
+            ([-5, -2], True),
+            ([1, 0], False),
+            ([3, 2, 1], False),
+            ([0, -3, -1], False),
+            ([-7, -20], False),
+        ]
+        for inp, expected_result in params:
+            with self.subTest(inp=inp):
+                self.assertEqual(_is_sorted(inp), expected_result)
         
 
 class TestBogoSort(unittest.TestCase):
-    def test_empty(self):
-        empty = []
-        self.assertEqual(bogo_sort(empty), [])
-        self.assertEqual(bogo_sort_randomized(empty), [])
-    
+
     def test_sorting(self):
-        a = [5]
-        self.assertEqual(bogo_sort(a), [5])
-        self.assertEqual(bogo_sort_randomized(a), [5])
-
-        b = [1, 5, 2, 42]
-        self.assertEqual(bogo_sort(b), [1, 2, 5, 42])
-        self.assertEqual(bogo_sort_randomized(b), [1, 2, 5, 42])
-
-        c = [9, 8, 0, 5]
-        self.assertEqual(bogo_sort(c), [0, 5, 8, 9])
-        self.assertEqual(bogo_sort_randomized(c), [0, 5, 8, 9])
-        
-        d = [-1, -2, 0, -100]
-        self.assertEqual(bogo_sort(d), [-100, -2, -1, 0])
-        self.assertEqual(bogo_sort_randomized(d), [-100, -2, -1, 0])
+        params = [
+            ([], []),
+            ([5], [5]),
+            ([1, 5, 2, 42], [1, 2, 5, 42]),
+            ([9, 8, 0, 5], [0, 5, 8, 9]),
+            ([-1, -2, 0, -100], [-100, -2, -1, 0])
+        ]
+        for (unsorted, expected_result), sorter in product(params, [bogo_sort, bogo_sort_randomized]):
+            with self.subTest(unsorted=unsorted, sorter=sorter):
+                self.assertEqual(sorter(unsorted), expected_result)
 
 
 if __name__ == "__main__":
